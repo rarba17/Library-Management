@@ -1,5 +1,6 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
-from fastapi.concurrency import asynccontextmanager
 from app.database import engine, Base
 from app.routers import books,users
 from app import models
@@ -14,10 +15,11 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Library Management System",
     description="A simple library management system API",
+    lifespan=lifespan,
 )
 
-#app.include_router(books.routers )
-#app.include_router(users.routers)
+app.include_router(books.router)
+app.include_router(users.router)
 
 
 @app.get("/")
@@ -27,5 +29,4 @@ def check():
 @app.get("/health")
 def health_check():
     return {"status":"healthy"}
-
 

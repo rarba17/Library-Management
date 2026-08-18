@@ -26,7 +26,7 @@ class BookUpdate(BaseModel):
     total_copies: Optional[int] = None
     available_copies: Optional[int] = None
 
-class Bookresponse(BookBase):
+class BookResponse(BookBase):
     id: int
     available_copies: int
     created_at: datetime
