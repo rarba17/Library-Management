@@ -31,11 +31,13 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     username: str = Field(..., min_length=3, max_length=50)
-    password: str = Field(..., min_length=8)
+    password: str = Field(..., min_length=8, max_length=72)
 
     @field_validator('password')
     @classmethod
     def validate_password(cls, v: str) -> str:
+        if len(v.encode("utf-8")) > 72:
+            raise ValueError('Password must be 72 bytes or fewer')
         if not any(char.isdigit() for char in v):
             raise ValueError('Password must contain at least one digit')
         if not any(char.isupper() for char in v):
@@ -80,12 +82,21 @@ class UserUpdate(BaseModel):
         return v
 
 class UserPasswordUpdate(BaseModel):
-    current_password: str = Field(..., min_length=8)
-    new_password: str = Field(..., min_length=8)
+    current_password: str = Field(..., min_length=8, max_length=72)
+    new_password: str = Field(..., min_length=8, max_length=72)
+
+    @field_validator('current_password')
+    @classmethod
+    def validate_current_password_length(cls, v: str) -> str:
+        if len(v.encode("utf-8")) > 72:
+            raise ValueError('Password must be 72 bytes or fewer')
+        return v
 
     @field_validator('new_password')
     @classmethod
     def validate_new_password(cls, v: str) -> str:
+        if len(v.encode("utf-8")) > 72:
+            raise ValueError('Password must be 72 bytes or fewer')
         if not any(char.isdigit() for char in v):
             raise ValueError('Password must contain at least one digit')
         if not any(char.isupper() for char in v):
@@ -120,7 +131,7 @@ class UserListResponse(BaseModel):
 # Login Schemas
 class UserLogin(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
-    password: str = Field(..., min_length=8)
+    password: str = Field(..., min_length=8, max_length=72)
 
 # Book Schemas
 class BookBase(BaseModel):

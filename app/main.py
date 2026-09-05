@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
-from app.database import engine, Base
+from app.database import ensure_schema
 from app.routers import books,users, auth
 from fastapi.middleware.cors import CORSMiddleware
 from app import models
@@ -9,7 +9,7 @@ from app import models
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    Base.metadata.create_all(bind=engine)
+    ensure_schema()
     yield
 
 app = FastAPI(
@@ -38,4 +38,3 @@ def check():
 @app.get("/health")
 def health_check():
     return {"status":"healthy"}
-
